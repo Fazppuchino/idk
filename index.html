@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Proxy</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      align-items: center;
+      background: #10131a;
+      color: #f4f6fb;
+      display: flex;
+      font: 16px system-ui, sans-serif;
+      justify-content: center;
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    main { max-width: 520px; width: 100%; }
+    h1 { font-size: 2rem; margin-bottom: 8px; }
+    p { color: #b6bdcc; line-height: 1.5; }
+    form { display: flex; gap: 8px; margin-top: 24px; }
+    input, button {
+      border: 0;
+      border-radius: 8px;
+      font: inherit;
+      padding: 12px 14px;
+    }
+    input { background: #242a36; color: inherit; flex: 1; min-width: 0; }
+    button { background: #7c6cff; color: white; cursor: pointer; }
+    button:hover { background: #9184ff; }
+    #error { color: #ff9a9a; min-height: 1.5em; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>My Proxy</h1>
+    <p>Enter a website address to open it.</p>
+    <form id="open-site">
+      <input id="site" type="text" placeholder="example.com" autocomplete="url" required>
+      <button type="submit">Go</button>
+    </form>
+    <p id="error" role="alert"></p>
+  </main>
+  <script>
+    const WISP_URL = "wss://sleek.loan";
+    const form = document.getElementById("open-site");
+    const siteInput = document.getElementById("site");
+    const error = document.getElementById("error");
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      error.textContent = "";
+
+      const entered = siteInput.value.trim();
+      const address = /^[a-z][a-z\d+.-]*:\/\//i.test(entered)
+        ? entered
+        : `https://${entered}`;
+
+      let target;
+      try {
+        target = new URL(address);
+      } catch {
+        error.textContent = "Enter a valid website address.";
+        return;
+      }
+
+      if (target.protocol !== "http:" && target.protocol !== "https:") {
+        error.textContent = "Use a website address starting with http:// or https://.";
+        return;
+      }
+
+      const embed = new URL("study.xml", window.location.href);
+      embed.search = new URLSearchParams({
+        w1: btoa(WISP_URL),
+        go: btoa(target.href)
+      }).toString();
+      window.location.assign(embed);
+    });
+  </script>
+</body>
+</html>
